@@ -65,15 +65,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # dataset info
-    parser.add_argument('--input_channels', type=int, default=0)
-    parser.add_argument('--class_count', type=int, default=0)
+    parser.add_argument('--input_channels', type=int, default=3)
+    parser.add_argument('--class_count', type=int, default=256)
 
     # training settings
-    parser.add_argument('--lr', type=float, default=0)
-    parser.add_argument('--momentum', type=float, default=0)
-    parser.add_argument('--weight_decay', type=float, default=0)
-    parser.add_argument('--num_epochs', type=int, default=0)
-    parser.add_argument('--batch_size', type=int, default=0)
+    parser.add_argument('--lr', type=float, default=0.1)
+    parser.add_argument('--momentum', type=float, default=0.9)
+    parser.add_argument('--weight_decay', type=float, default=0.0001)
+    parser.add_argument('--num_epochs', type=int, default=70)
+    parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--pretrained_model', type=str, default=None)
     parser.add_argument('--config', type=str, default='121',
                         choices=['121', '169', '201', '264'])
