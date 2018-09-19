@@ -2,6 +2,10 @@ import os
 import torch
 import time
 import datetime
+import torch.nn as nn
+import torch.optim as optim
+
+from model import DenseNet
 
 
 class Solver(object):
@@ -31,19 +35,32 @@ class Solver(object):
         Instantiates the model, loss criterion, and optimizer
         """
 
-        # TODO: instantiate model
+        # instantiate model
+        self.model = DenseNet(config=self.config,
+                              channels=self.input_channels,
+                              class_count=self.class_count,
+                              num_features=self.num_features,
+                              compress_factor=self.compress_factor,
+                              expand_factor=self.expand_factor,
+                              growth_rate=self.growth_rate)
 
-        # TODO: instantiate loss criterion
+        # instantiate loss criterion
+        self.criterion = nn.CrossEntropyLoss()
 
-        # TODO: instantiate optimizer
+        # instantiate optimizer
+        self.optimizer = optim.SGD(params=self.model.parameters(),
+                                   lr=self.lr,
+                                   momentum=self.momentum,
+                                   weight_decay=self.weight_decay,
+                                   nesterov=True)
 
-        # TODO: print network
-        # self.print_network(self.model, '')
+        # print network
+        self.print_network(self.model, 'DenseNet')
 
-        # TODO: use gpu if enabled
-        # if torch.cuda.is_available() and self.use_gpu:
-        #    self.model.cuda()
-        #    self.criterion.cuda()
+        # use gpu if enabled
+        if torch.cuda.is_available() and self.use_gpu:
+            self.model.cuda()
+            self.criterion.cuda()
 
     def print_network(self, model, name):
         """
