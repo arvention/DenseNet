@@ -128,33 +128,31 @@ class Solver(object):
         A step for each iteration
         """
 
-        # TODO: set model in training mode
-        # self.model.train()
+        # set model in training mode
+        self.model.train()
 
-        # TODO: empty the gradients of the model through the optimizer
-        # TODO: self.optimizer.zero_grad()
+        # empty the gradients of the model through the optimizer
+        self.optimizer.zero_grad()
 
-        # TODO: forward pass
-        # TODO: output = self.model(images)
+        # forward pass
+        output = self.model(images)
 
-        # TODO: compute loss
-        # TODO: self.criterion(output, labels.squeeze())
+        # compute loss
+        loss = self.criterion(output, labels.squeeze())
 
-        # TODO: compute gradients using back propagation
-        # loss.backward()
+        # compute gradients using back propagation
+        loss.backward()
 
-        # TODO: update parameters
-        # self.optimizer.step()
+        # update parameters
+        self.optimizer.step()
 
-        # TODO: return loss
         # return loss
-        pass
+        return loss
 
     def train(self):
         """
         Training process
         """
-        # TODO: add training process
         self.losses = []
         self.top_1_acc = []
         self.top_5_acc = []
