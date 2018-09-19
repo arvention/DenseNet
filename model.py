@@ -215,6 +215,7 @@ class DenseNet(nn.Module):
                 self.num_features = out_channels
 
         layers.append(nn.BatchNorm2d(num_features=self.num_features))
+        layers.append(nn.ReLU(inplace=True))
         layers.append(nn.AvgPool2d(kernel_size=7,
                                    stride=1))
 
@@ -231,9 +232,21 @@ class DenseNet(nn.Module):
         """
         initializes weights for each layer
         """
-        pass
+        for module in self.modules():
+            if isinstance(module, nn.Conv2d):
+                nn.init.kaiming_normal_(module.weights)
+            elif isinstance(module, nn.BatchNorm2d):
+                nn.init.constant_(module.weights, 1)
+                nn.init.constant_(module.bias, 0)
+            elif isinstance(module, nn.Linear):
+                nn.init.constant_(module.bias, 0)
 
     def forward(self, x):
         """
         feed forward
         """
+        y = self.fc_net(x)
+        y = y.view(-1, y.size(1) * y.size(2) * y.size(3))
+        y = self.fc_net(y)
+        return y
+        return y
