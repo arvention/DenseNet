@@ -75,6 +75,12 @@ if __name__ == '__main__':
     parser.add_argument('--num_epochs', type=int, default=0)
     parser.add_argument('--batch_size', type=int, default=0)
     parser.add_argument('--pretrained_model', type=str, default=None)
+    parser.add_argument('--config', type=str, default='121',
+                        choices=['121', '169', '201', '264'])
+    parser.add_argument('--num_features', type=int, default=64)
+    parser.add_argument('--compress_factor', type=int, default=2)
+    parser.add_argument('--expand_factor', type=int, default=4)
+    parser.add_argument('--growth_rate', type=int, default=32)
 
     # misc
     parser.add_argument('--mode', type=str, default='train',
