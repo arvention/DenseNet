@@ -9,13 +9,13 @@ class DenseLayer(nn.Module):
 
     def __init__(self,
                  in_channels,
-                 expansion_factor=4,
+                 expand_factor=4,
                  growth_rate=32):
         super(DenseLayer, self).__init__()
 
         self.in_channels = in_channels
         self.growth_rate = growth_rate
-        self.bottleneck_size = expansion_factor * growth_rate
+        self.bottleneck_size = expand_factor * growth_rate
 
         self.conv1x1 = self.get_conv1x1()
         self.conv3x3 = self.get_conv3x3()
@@ -73,13 +73,13 @@ class DenseBlock(nn.Module):
     def __init__(self,
                  in_channels,
                  num_layers,
-                 expansion_factor=4,
+                 expand_factor=4,
                  growth_rate=32):
         super(DenseBlock, self).__init__()
 
         self.in_channels = in_channels
         self.num_layers = num_layers
-        self.expansion_factor = expansion_factor
+        self.expand_factor = expand_factor
         self.growth_rate = growth_rate
 
         self.net = self.get_network()
@@ -93,7 +93,7 @@ class DenseBlock(nn.Module):
         for i in range(self.num_layers):
             in_channels = self.in_channels + i * self.growth_rate
             layers.append(DenseBlock(in_channels=in_channels,
-                                     expansion_factor=self.expansion_factor,
+                                     expand_factor=self.expand_factor,
                                      growth_rate=self.growth_rate))
 
         return nn.Sequential(*layers)
@@ -158,28 +158,74 @@ class DenseNet(nn.Module):
 
     """DenseNet Architecture"""
 
-    def __init__(self, config, channels, class_count):
+    def __init__(self,
+                 config,
+                 channels,
+                 class_count,
+                 num_features=64,
+                 compress_factor=2,
+                 expand_factor=4,
+                 growth_rate=32):
         super(DenseNet, self).__init__()
-        self.config = config
+        self.config = configs[config]
         self.channels = channels
         self.class_count = class_count
 
-        self.conv_net = self.get_conv_net()
+        self.num_features = num_features
+        self.compress_factor = compress_factor
+        self.expand_factor = expand_factor
+        self.growth_rate = growth_rate
+
+        self.conv_net = self.get_conv_network()
         self.fc_net = self.get_fc_net()
 
         self.init_weights()
 
-    def get_conv_net(self):
+    def get_conv_network(self):
         """
         returns the convolutional layers of the network
         """
-        pass
+        layers = []
+
+        layers.append(nn.Conv2d(in_channels=self.channels,
+                                out_channels=self.num_features,
+                                kernel_size=7,
+                                stride=2,
+                                padding=3,
+                                bias=False))
+        layers.append(nn.BatchNorm2d(num_features=self.num_features))
+        layers.append(nn.ReLU(inplace=True))
+        layers.append(nn.MaxPool2d(kernel_size=3,
+                                   stride=2,
+                                   padding=1))
+
+        for i, num_layers in enumerate(self.config):
+            layers.append(DenseBlock(in_channels=self.num_features,
+                                     num_layers=num_layers,
+                                     expand_factor=self.expand_factor,
+                                     growth_rate=self.growth_rate))
+
+            self.num_features += num_layers * self.growth_rate
+
+            if i != len(self.config) - 1:
+                out_channels = self.num_features // self.compress_factor
+                layers.append(TransitionBlock(in_channels=self.num_features,
+                                              out_channels=out_channels))
+
+                self.num_features = out_channels
+
+        layers.append(nn.BatchNorm2d(num_features=self.num_features))
+        layers.append(nn.AvgPool2d(kernel_size=7,
+                                   stride=1))
+
+        return nn.Sequential(*layers)
 
     def get_fc_net(self):
         """
         returns the fully connected layers of the network
         """
-        pass
+        return nn.Linear(in_features=self.num_features,
+                         out_features=self.class_count)
 
     def init_weights(self):
         """
