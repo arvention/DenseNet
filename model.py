@@ -249,4 +249,3 @@ class DenseNet(nn.Module):
         y = y.view(-1, y.size(1) * y.size(2) * y.size(3))
         y = self.fc_net(y)
         return y
-        return y
