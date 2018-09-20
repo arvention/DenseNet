@@ -245,7 +245,7 @@ class DenseNet(nn.Module):
         """
         feed forward
         """
-        y = self.fc_net(x)
+        y = self.conv_net(x)
         y = y.view(-1, y.size(1) * y.size(2) * y.size(3))
         y = self.fc_net(y)
         return y
