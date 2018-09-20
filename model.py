@@ -43,7 +43,7 @@ class DenseLayer(nn.Module):
         """
         layers = []
         layers.append(nn.BatchNorm2d(num_features=self.bottleneck_size))
-        layers.append(nn.ReLu(inplace=True))
+        layers.append(nn.ReLU(inplace=True))
         layers.append(nn.Conv2d(in_channels=self.bottleneck_size,
                                 out_channels=self.growth_rate,
                                 kernel_size=3,
@@ -92,7 +92,7 @@ class DenseBlock(nn.Module):
 
         for i in range(self.num_layers):
             in_channels = self.in_channels + i * self.growth_rate
-            layers.append(DenseBlock(in_channels=in_channels,
+            layers.append(DenseLayer(in_channels=in_channels,
                                      expand_factor=self.expand_factor,
                                      growth_rate=self.growth_rate))
 
@@ -234,9 +234,9 @@ class DenseNet(nn.Module):
         """
         for module in self.modules():
             if isinstance(module, nn.Conv2d):
-                nn.init.kaiming_normal_(module.weights)
+                nn.init.kaiming_normal_(module.weight)
             elif isinstance(module, nn.BatchNorm2d):
-                nn.init.constant_(module.weights, 1)
+                nn.init.constant_(module.weight, 1)
                 nn.init.constant_(module.bias, 0)
             elif isinstance(module, nn.Linear):
                 nn.init.constant_(module.bias, 0)
