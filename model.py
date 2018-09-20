@@ -102,7 +102,7 @@ class DenseBlock(nn.Module):
         """
         feed forward
         """
-        return self.layers(x)
+        return self.net(x)
 
 
 class TransitionBlock(nn.Module):
