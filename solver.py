@@ -71,9 +71,9 @@ class Solver(object):
         num_params = 0
         for p in model.parameters():
             num_params += p.numel()
-            print(name)
-            print(model)
-            print("The number of parameters: {}".format(num_params))
+        print(name)
+        print(model)
+        print("The number of parameters: {}".format(num_params))
 
     def load_pretrained_model(self):
         """
@@ -98,7 +98,7 @@ class Solver(object):
         total_time = str(datetime.timedelta(seconds=total_time))
         elapsed = str(datetime.timedelta(seconds=elapsed))
 
-        log = "Elapsed {}/{} -- {}, Epoch [{}/{}] Iter [{}/{}]," \
+        log = "Elapsed {}/{} -- {}, Epoch [{}/{}], Iter [{}/{}], " \
               "loss: {:.4f}".format(elapsed,
                                     epoch_time,
                                     total_time,
@@ -119,7 +119,7 @@ class Solver(object):
         """
         path = os.path.join(
             self.model_save_path,
-            '{}_{}_{}.pth'.format(self.version, e + 1, i + 1)
+            '/{}/{}--{}.pth'.format(self.version, e + 1, i + 1)
         )
         torch.save(self.model.state_dict(), path)
 
@@ -161,7 +161,7 @@ class Solver(object):
 
         # start with a trained model if exists
         if self.pretrained_model:
-            start = int(self.pretrained_model.split('_')[1]) - 1
+            start = int(self.pretrained_model.split('--')[0])
         else:
             start = 0
 
@@ -174,7 +174,7 @@ class Solver(object):
 
                 loss = self.model_step(images, labels)
 
-            # print out log loss
+            # print out loss log
             if (e + 1) % self.loss_log_step == 0:
                 self.print_loss_log(start_time, iters_per_epoch, e, i, loss)
                 self.losses.append((e, loss))
@@ -245,7 +245,7 @@ class Solver(object):
         Evaluates the performance of the model using the train dataset
         """
         top_1_correct, top_5_correct, total = self.eval(self.data_loader)
-        log = "Epoch[{}/{}]--top_1_acc: {:.4f}--top_5_acc: {:.4f}".format(
+        log = "Epoch [{}/{}]--top_1_acc: {:.4f}--top_5_acc: {:.4f}".format(
             e + 1,
             self.num_epochs,
             top_1_correct / total,
